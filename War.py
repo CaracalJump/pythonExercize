@@ -1,3 +1,5 @@
+from random import shuffle
+
 class Card:
     suits = ["spades", "hearts", "diamonds", "clubs"]
 
@@ -7,7 +9,6 @@ class Card:
 
     def __init__(self, v, s):
         """suit and value are integer"""
-
         self.value = v
         self.suit = s
 
@@ -15,20 +16,22 @@ class Card:
         if self.value < c2.value:
             return True
         if self.value == c2.value:
-            if self.suit < c2.suit:
-                return True
-            else:
-                return False
+            return self.suit < c2.suit
+            # if self.suit < c2.suit:
+            #     return True
+            # else:
+            #     return False
         return False
 
     def __gt__(self, c2):
         if self.value > c2.value:
             return True
         if self.value == c2.value:
-            if self.suit > c2.suit:
-                return True
-            else:
-                return False
+            return self.suit > c2.suit
+            # if self.suit > c2.suit:
+            #     return True
+            # else:
+            #     return False
         return False
 
     def __repr__(self):
@@ -36,22 +39,23 @@ class Card:
             + self.suits[self.suit]
         return v
 
-from random import shuffle
 
 class Deck:
+
     def __init__(self):
         self.cards = []
+        self.add_cards()
+
+    def add_cards(self):
         for i in range(2, 15):
             for j in range(4):
                 self.cards.append(Card(i, j))
-        shuffle(self.cards)
-
-    def rm_card(self):
-        if len(self.cards) == 0:
-            for i in range(2, 15):
-                for j in range(4):
-                    self.cards.append(Card(i, j))
             shuffle(self.cards)
+
+    # def rm_card(self):
+    def draw(self):
+        if len(self.cards) == 0:
+            self.add_cards()
         return self.cards.pop()
 
 class Player:
@@ -69,15 +73,17 @@ class Game:
         self.p1 = Player(name1)
         self.p2 = Player(name2)
 
-    def wins(self, winner):
+    def print_winner(self, winner):
         w = "This round, winner is {}."
-        w = w.format(winner)
-        print(w)
+        # w = w.format(winner)
+        # print(w)
+        print(w.format(winner.name))
 
-    def draw(self, p1n, p1c, p2n, p2c):
+    def print_draw(self, p1, p2):
         d = "{} is {}, {} is {}."
-        d = d.format(p1n, p1c, p2n, p2c)
-        print(d)
+        # d = d.format(p1n, p1c, p2n, p2c)
+        # print(d)
+        print(d.format(p1.name, p1.card, p2.name, p2.card))
 
     def play_game(self):
         cards = self.deck.cards
@@ -87,20 +93,19 @@ class Game:
             response = input(m)
             if response == "q":
                     break
-            n = input("What time do you war?: ")
+            n = input("What time will you war?: ")
             for j in range(0, int(n)-1):
                 for i in range(0, 26):
-                    p1c = self.deck.rm_card()
-                    p2c = self.deck.rm_card()
-                    p1n = self.p1.name
-                    p2n = self.p2.name
-                    self.draw(p1n, p1c, p2n, p2c)
-                    if p1c > p2c:
+                    self.p1.card = self.deck.draw()
+                    self.p2.card = self.deck.draw()
+                    self.print_draw(self.p1, self.p2)
+                    if self.p1.card > self.p2.card:
                         self.p1.wins += 1
-                        self.wins(self.p1.name)
+                        # self.wins(self.p1.name)
+                        self.print_winner(self.p1)
                     else:
                         self.p2.wins += 2
-                        self.wins(self.p2.name)
+                        self.print_winner(self.p2)
 
             win = self.winner(self.p1, self.p2)
             print("Game Over! {} is winner!".format(win))
